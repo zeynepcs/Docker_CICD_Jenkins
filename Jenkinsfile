@@ -7,42 +7,34 @@ pipeline {
         maven "MY_MAVEN"
     }
 
-    
     stages {
         stage('clean and checkout') {
             steps {
-            
-             
-                sh 'mvn clean'
+            dir("backend") {
+                sh 'mvn clean -f backend'
                 echo 'downloading github project...'
-                git branch: 'main', credentialsId: 'crdentialsI', url: 'githubURL'
-            }
-            
+                git branch: 'master', credentialsId: 'zeynepcs', url: 'URL'
+            }            
      }
-        stage('Test') {
-            steps {
-                sh 'mvn test'
-            }
-            
-       
+  }  
+        
         stage('build') {
-            steps {
+           steps {
+            dir("backend") {
                 echo 'building...'
-                sh 'mvn test-compile'
+                sh 'mvn package -f backend'
                 echo 'finished building'
             }
         }
-
-       
-
-        stage('package') {
-            steps {
-                echo 'packaging...'
-                sh 'mvn war:war'
-                echo 'packaged'
+      }  
+         stage('deploy') {
+           steps {
+            dir("backend") {
+                echo 'deploying...'
+                sh 'cp backend/target/ROOT.war /artifacts'
+                echo 'deployed'
             }
         }
     }
-
-    
-}
+ }
+ }
